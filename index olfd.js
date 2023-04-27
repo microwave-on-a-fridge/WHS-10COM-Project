@@ -12,49 +12,42 @@ console.log("10COM JS Project");
 const WIDTH = 600;
 const HEIGHT = 800;
 const BG_COLOR = "#EFB0FF";
-const PLAYER_WIDTH = 20;
 const PLAYER_HEIGHT = 20;
+const PLAYER_WIDTH = 20;
 const PLAYER_COLOR = "#7FFFD4";
 const PLAYER_HIT_COLOR = "#8E17A3";
-const ENEMY_WIDTH = 20;
-const ENEMY_HEIGHT = 20;
-const ENEMY_Y_SPEED = 4;
+const ENEMY_WIDTH = 10;
+const ENEMY_HEIGHT = 10;
+const ENEMY_X_SPEED = 10;
+const ENEMY_Y_SPEED = 10;
 const ENEMY_COLOR = "#FF2222";
-
 var ctx;
 var playerXPosition = 30;
 var playerYPosition = 30;
-var playerColor;
 var enemyArray = [];
-
 window.onload = startCanvas;
 
 function startCanvas() {
   ctx = document.getElementById("myCanvas").getContext("2d");
   timer = setInterval(updateCanvas, 20);
-
   var enemyNumber = 0;
   while (enemyNumber < 200) {
+    // Keep going until you get to the last drop
     enemyArray.push(new Enemy(Math.random() * WIDTH));
-    enemyNumber++;
+    enemyNumber++; // Do the next drop
   }
-  console.log("There are", enemyArray.length, "enemies in the enemyArray");
 }
 
 function updateCanvas() {
-  //Colours the background
-  ctx.fillStyle = "BG_COLOR";
+  ctx.fillStyle = BG_COLOR;
   ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
-  var enemyNumber = 0;
-  while (enemyNumber < enemyArray.length) {
-    enemyArray[enemyNumber].moveEnemy();
-    enemyNumber++;
-  }
+  ctx.fillStyle = PLAYER_COLOR;
+  ctx.fillRect(playerXPosition, playerYPosition, PLAYER_WIDTH, PLAYER_HEIGHT);
 
-  playerColor = PLAYER_COLOR;
+  var playerColor = PLAYER_COLOR;
 
-  var enemyNumber = 0;
+  var enemyNumber = 0; // Start at drop 0
   while (enemyNumber < enemyArray.length) {
     if (
       playerHit(
@@ -62,14 +55,16 @@ function updateCanvas() {
         enemyArray[enemyNumber].yPosition
       )
     ) {
-      playerColor = PLAYER_HIT_COLOR;
-      enemyArray[enemyNumber].yPosition = Math.random() * -HEIGHT;
+      // Check the drop's xPosition and yPosition
+      playerColor = PLAYER_HIT_COLOR; // Change the umbrella color
+      enemyArray[enemyNumber].yPosition = Math.random() * -HEIGHT; // Reset the yPosition to the top
     }
     enemyNumber++;
   }
 
-  var enemyNumber = 0;
+  var enemyNumber = 0; // Start at drop 0
   while (enemyNumber < enemyArray.length) {
+    // Keep going until you get to the last drop
     ctx.fillStyle = ENEMY_COLOR;
     ctx.fillRect(
       enemyArray[enemyNumber].xPosition,
@@ -77,11 +72,8 @@ function updateCanvas() {
       ENEMY_WIDTH,
       ENEMY_HEIGHT
     );
-    enemyNumber++;
+    enemyNumber++; // Do the next drop
   }
-
-  ctx.fillStyle = playerColor;
-  ctx.fillRect(playerXPosition, playerYPosition, PLAYER_WIDTH, PLAYER_HEIGHT);
 }
 
 class Enemy {
@@ -97,32 +89,30 @@ class Enemy {
 		The constructor sets up the properties. Each one starts with "this." That tells JavaScript that it is a variable inside this object.
 		All variables to do with this object that are not CONST need to be defined here.
 		*/
-    this.xPosition = x;
-    // Task 8a
-    // The rain looks terrible!
-    // The drops should start at random heights
-    // Change the line below that sets the yPosition
-    // Make them appear at a random position above the canvas
-    // A y position between 0 and -HEIGHT (negative y is above the canvas)
+    this.xPosition = Math.random() * -WIDTH;
     this.yPosition = Math.random() * -HEIGHT;
   }
   moveEnemy() {
     // Move the rain - Change it's position
+    this.xPosition += ENEMY_X_SPEED;
     this.yPosition += ENEMY_Y_SPEED;
 
     // When rain it's the bottom, restart at the top
+    if (this.xPosition > WIDTH) {
+      this.xPosition = 0; // There is a problem here. This line means the rain flickers in at the top of the canvas. See if you can fix it.
+    }
     if (this.yPosition > HEIGHT) {
       this.yPosition = 0; // There is a problem here. This line means the rain flickers in at the top of the canvas. See if you can fix it.
     }
   }
 }
 
-function playerHit(enemyX, enemyY) {
+function playerHit(enemyXPosition, enemyYPosition) {
   if (
-    playerXPosition + PLAYER_WIDTH > enemyX &&
-    playerXPosition < enemyX + ENEMY_WIDTH &&
-    playerYPosition + PLAYER_HEIGHT > enemyY &&
-    playerYPosition < enemyY + ENEMY_HEIGHT
+    playerXPosition + PLAYER_WIDTH >= enemyXPosition &&
+    playerXPosition <= enemyXPosition + ENEMY_WIDTH &&
+    playerYPosition + PLAYER_HEIGHT >= enemyYPosition &&
+    playerYPosition <= enemyYPosition + ENEMY_HEIGHT
   ) {
     return true;
   } else {
@@ -133,6 +123,7 @@ function playerHit(enemyX, enemyY) {
 window.addEventListener("mousemove", mouseMovedFunction);
 
 function mouseMovedFunction(mouseEvent) {
+  // Set the umbrella  position to the mouse position
   playerXPosition = mouseEvent.offsetX;
   playerYPosition = mouseEvent.offsetY;
 }
