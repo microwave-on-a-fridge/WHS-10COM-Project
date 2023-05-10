@@ -2,7 +2,7 @@
  * Title: 10COM Game Project
  * Author: Koen Hina
  * Date: 11/5/2023
- * Version: 1
+ * Version: 1 (Initial version)
  * Description: Vertical shooter game.
  * License: MIT
  **/
@@ -19,13 +19,6 @@ const ENEMY_HEIGHT = 38;
 const ENEMY_COLOR = "#FF2222";
 const HARD_ENEMY_WIDTH = 50;
 const HARD_ENEMY_HEIGHT = 50;
-/*
-const AUDIOCTX = new AudioContext();
-const AUDIO = new Audio("audio.mp3");
-const SOURCE = AUDIOCTX.createMediaElementSource(AUDIO);
-SOURCE.connect(AUDIOCTX.destination);
-AUDIO.play();
-*/
 
 var ctx;
 var level = 0;
@@ -46,7 +39,6 @@ hardEnemyImage.src = "images/hard.png";
 var hardEnemySpeed = 3;
 
 window.onload = startCanvas;
-onLoad = progression;
 
 function startCanvas() {
   ctx = document.getElementById("myCanvas").getContext("2d");
@@ -92,19 +84,6 @@ function updateCanvas() {
   ctx.fillStyle = "#000000";
   ctx.fillText("Level " + level, 0, 25);
 
-  if (playerXPosition > WIDTH) {
-    playerXPosition = WIDTH - 24;
-  }
-  if (playerYPosition > HEIGHT) {
-    playerYPosition = HEIGHT - 38;
-  }
-  if (playerXPosition < 0) {
-    playerXPosition = 0;
-  }
-  if (playerYPosition < 0) {
-    playerYPosition = 0;
-  }
-
   var enemyNumber = 0;
   while (enemyNumber < enemyArray.length) {
     enemyArray[enemyNumber].moveEnemy();
@@ -139,6 +118,7 @@ function updateCanvas() {
         hardEnemyArray[hardEnemyNumber].yPosition
       )
     ) {
+      //player colour hit
       hardEnemyArray[hardEnemyNumber].yPosition = Math.random() * -HEIGHT;
     }
     hardEnemyNumber++;
@@ -179,7 +159,7 @@ function updateCanvas() {
 
 //Controls ordinary enemies
 class Enemy {
-  constructor() {
+  constructor(x) {
     this.xPosition = Math.random() * -WIDTH;
     this.yPosition = Math.random() * -HEIGHT;
   }
@@ -198,7 +178,7 @@ class Enemy {
 
 //Controls big enemies
 class HardEnemy {
-  constructor() {
+  constructor(x) {
     this.xPosition = Math.random() * -WIDTH;
     this.yPosition = Math.random() * -HEIGHT;
   }
@@ -251,10 +231,6 @@ function playerHit(enemyX, enemyY, hardEnemyX, hardEnemyY) {
     hardEnemyHitWidth,
     hardEnemyHitHeight
   );
-  ctx.font = "15px arial";
-  ctx.fillStyle = "#000000";
-  ctx.fillText("X pos = " + playerXPosition, 400, 25);
-  ctx.fillText("Y pos = " + playerYPosition, 400, 40);
   */
 
   if (
