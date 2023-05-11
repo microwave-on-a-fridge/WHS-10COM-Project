@@ -62,7 +62,7 @@ function progression() {
     enemyNumber++;
   }
   //At level 5 a new enemy type is made
-  if (level > 5) {
+  if (level >= 5) {
     var hardEnemyNumber = 0;
     while (hardEnemyNumber < hardEnemyCap) {
       hardEnemyArray.push(new HardEnemy(Math.random() * WIDTH));
@@ -92,11 +92,11 @@ function updateCanvas() {
   ctx.fillStyle = "#000000";
   ctx.fillText("Level " + level, 0, 25);
 
-  if (playerXPosition > WIDTH) {
-    playerXPosition = WIDTH - 24;
+  if (playerXPosition > WIDTH - PLAYER_WIDTH) {
+    playerXPosition = WIDTH - PLAYER_WIDTH;
   }
-  if (playerYPosition > HEIGHT) {
-    playerYPosition = HEIGHT - 38;
+  if (playerYPosition > HEIGHT - PLAYER_WIDTH) {
+    playerYPosition = HEIGHT - PLAYER_WIDTH;
   }
   if (playerXPosition < 0) {
     playerXPosition = 0;
@@ -203,14 +203,14 @@ class HardEnemy {
     this.yPosition = Math.random() * -HEIGHT;
   }
   moveHardEnemy() {
-    this.xPosition += hardEnemySpeed;
-    this.yPosition += hardEnemySpeed;
+    this.xPosition -= hardEnemySpeed;
+    this.yPosition -= hardEnemySpeed;
 
-    if (this.xPosition > WIDTH) {
-      this.xPosition = 0;
+    if (this.xPosition < 0 - HARD_ENEMY_WIDTH) {
+      this.xPosition = WIDTH;
     }
-    if (this.yPosition > HEIGHT) {
-      this.yPosition = 0;
+    if (this.yPosition < 0 - HARD_ENEMY_HEIGHT) {
+      this.yPosition = HEIGHT;
     }
   }
 }
