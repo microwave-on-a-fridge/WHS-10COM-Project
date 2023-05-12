@@ -95,8 +95,8 @@ function updateCanvas() {
   if (playerXPosition > WIDTH - PLAYER_WIDTH) {
     playerXPosition = WIDTH - PLAYER_WIDTH;
   }
-  if (playerYPosition > HEIGHT - PLAYER_WIDTH) {
-    playerYPosition = HEIGHT - PLAYER_WIDTH;
+  if (playerYPosition > HEIGHT - PLAYER_HEIGHT) {
+    playerYPosition = HEIGHT - PLAYER_HEIGHT;
   }
   if (playerXPosition < 0) {
     playerXPosition = 0;
