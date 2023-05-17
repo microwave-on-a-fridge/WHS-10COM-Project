@@ -71,7 +71,7 @@ function progression() {
     hardEnemyCap + 1;
   }
   level++;
-  enemyCap + 5;
+  enemyCap + 3;
   enemySpeed + 1;
   console.log("There are", enemyArray.length, "enemies in the enemyArray");
   console.log(
@@ -84,11 +84,11 @@ function progression() {
 
 function updateCanvas() {
   //Colours the background
-  ctx.font = "30px arial";
   ctx.fillStyle = BG_COLOR;
   ctx.fillRect(0, 0, WIDTH, HEIGHT);
 
   //Controls the level display
+  ctx.font = "30px arial";
   ctx.fillStyle = "#000000";
   ctx.fillText("Level " + level, 0, 25);
 
@@ -127,6 +127,7 @@ function updateCanvas() {
     ) {
       //player colour hit
       enemyArray[enemyNumber].yPosition = Math.random() * -HEIGHT;
+      //return;
     }
     enemyNumber++;
   }
@@ -281,4 +282,9 @@ window.addEventListener("mousemove", mouseMovedFunction);
 function mouseMovedFunction(mouseEvent) {
   playerXPosition = mouseEvent.offsetX;
   playerYPosition = mouseEvent.offsetY;
+}
+
+function death() {
+  if (playerHit()) {
+  }
 }
