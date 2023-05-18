@@ -19,6 +19,8 @@ const ENEMY_HEIGHT = 38;
 const ENEMY_COLOR = "#FF2222";
 const HARD_ENEMY_WIDTH = 50;
 const HARD_ENEMY_HEIGHT = 50;
+const BOMB_WIDTH = 100;
+const BOMB_HEIGHT = 100;
 /*
 const AUDIOCTX = new AudioContext();
 const AUDIO = new Audio("audio.mp3");
@@ -44,6 +46,12 @@ var hardEnemyCap = 3;
 var hardEnemyImage = new Image();
 hardEnemyImage.src = "images/hard.png";
 var hardEnemySpeed = 3;
+var bomb = 3;
+var bombXPosition;
+var bombYPosition;
+var bombArray = [];
+var bombImage = new Image();
+bombImage.src = "images/bomb.png";
 
 window.onload = startCanvas;
 onLoad = progression;
@@ -91,6 +99,7 @@ function updateCanvas() {
   ctx.font = "30px arial";
   ctx.fillStyle = "#000000";
   ctx.fillText("Level " + level, 0, 25);
+  ctx.fillText(bomb + " bombs", 0, 55);
 
   if (playerXPosition > WIDTH - PLAYER_WIDTH) {
     playerXPosition = WIDTH - PLAYER_WIDTH;
@@ -284,7 +293,29 @@ function mouseMovedFunction(mouseEvent) {
   playerYPosition = mouseEvent.offsetY;
 }
 
-function death() {
-  if (playerHit()) {
+window.addEventListener("keydown", keyDownFunction);
+
+function keyDownFunction(keyboardEvent) {
+  var keyDown = keyboardEvent.key;
+  if (bomb > 0) {
+    if (keyDown == "b") {
+      bombArray.push(new Explosion());
+      bomb -= 1;
+    }
+  }
+  ctx.drawImage(
+    bombImage,
+    bombArray[bombNumber].xPosition,
+    bombArray[bombNumber].yPosition,
+    BOMB_WIDTH,
+    BOMB_HEIGHT
+  );
+  console.log("There are", bombArray.length, "bombs in the bombArray");
+}
+
+class Explosion {
+  constructor() {
+    this.xPosition = playerXPosition;
+    this.yPosition = playerXPosition;
   }
 }
