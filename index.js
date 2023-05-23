@@ -101,6 +101,7 @@ function updateCanvas() {
   ctx.fillText("Level " + level, 0, 25);
   ctx.fillText(bomb + " bombs", 0, 55);
 
+  //Controls the border to stop the player from being able to move out of the playfield to avoid being hit by the enemies
   if (playerXPosition > WIDTH - PLAYER_WIDTH) {
     playerXPosition = WIDTH - PLAYER_WIDTH;
   }
@@ -126,6 +127,7 @@ function updateCanvas() {
     hardEnemyNumber++;
   }
 
+  //Controls what happens if you get hit by a standard enemy
   var enemyNumber = 0;
   while (enemyNumber < enemyArray.length) {
     if (
@@ -134,13 +136,13 @@ function updateCanvas() {
         enemyArray[enemyNumber].yPosition
       )
     ) {
-      //player colour hit
-      enemyArray[enemyNumber].yPosition = Math.random() * -HEIGHT;
-      //return;
+      //enemyArray[enemyNumber].yPosition = Math.random() * -HEIGHT;
+      death();
     }
     enemyNumber++;
   }
 
+  //Controls what happens if you get hit by a hard enemy
   var hardEnemyNumber = 0;
   while (hardEnemyNumber < hardEnemyArray.length) {
     if (
@@ -154,6 +156,7 @@ function updateCanvas() {
     hardEnemyNumber++;
   }
 
+  //Draws standard enemies
   var enemyNumber = 0;
   while (enemyNumber < enemyArray.length) {
     ctx.drawImage(
@@ -166,6 +169,7 @@ function updateCanvas() {
     enemyNumber++;
   }
 
+  //Draws harder, larger enemies
   var hardEnemyNumber = 0;
   while (hardEnemyNumber < hardEnemyArray.length) {
     ctx.drawImage(
@@ -226,6 +230,7 @@ class HardEnemy {
 }
 
 function playerHit(enemyX, enemyY, hardEnemyX, hardEnemyY) {
+  //Hitbox stuff
   var playerHitLeft = playerXPosition + 6;
   var playerHitRight = playerXPosition + PLAYER_WIDTH - 6;
   var playerHitTop = playerYPosition + 6;
@@ -299,23 +304,21 @@ function keyDownFunction(keyboardEvent) {
   var keyDown = keyboardEvent.key;
   if (bomb > 0) {
     if (keyDown == "b") {
-      bombArray.push(new Explosion());
+      enemyCap - 30;
+      hardEnemyCap - 4;
       bomb -= 1;
     }
   }
-  ctx.drawImage(
-    bombImage,
-    bombArray[bombNumber].xPosition,
-    bombArray[bombNumber].yPosition,
-    BOMB_WIDTH,
-    BOMB_HEIGHT
-  );
   console.log("There are", bombArray.length, "bombs in the bombArray");
 }
 
-class Explosion {
-  constructor() {
-    this.xPosition = playerXPosition;
-    this.yPosition = playerXPosition;
+// This block of code is meant to give a death screen, but isn't working as of now
+function death() {
+  while (true) {
+    ctx.fillStyle = "#FFFFFF";
+    ctx.fillRect(0, 0, WIDTH, HEIGHT);
+    ctx.font = "30px arial";
+    ctx.fillStyle = "#000000";
+    ctx.fillText("You died!", 300, 400);
   }
 }
