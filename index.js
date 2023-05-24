@@ -19,8 +19,6 @@ const ENEMY_HEIGHT = 38;
 const ENEMY_COLOR = "#FF2222";
 const HARD_ENEMY_WIDTH = 50;
 const HARD_ENEMY_HEIGHT = 50;
-const BOMB_WIDTH = 100;
-const BOMB_HEIGHT = 100;
 /*
 const AUDIOCTX = new AudioContext();
 const AUDIO = new Audio("audio.mp3");
@@ -49,9 +47,10 @@ var hardEnemyImage = new Image();
 hardEnemyImage.src = "images/hard.png";
 var hardEnemySpeed = 3;
 var bomb = 3;
-var bombXPosition;
-var bombYPosition;
-var bombArray = [];
+var bombXPosition = playerXPosition;
+var bombYPosition = playerYPosition;
+var bombWidth = PLAYER_WIDTH;
+var bombHeight = PLAYER_HEIGHT;
 var bombImage = new Image();
 bombImage.src = "images/bomb.png";
 
@@ -148,6 +147,14 @@ function updateCanvas() {
     ) {
       dead = true;
     }
+    if (
+      bombHit(
+        enemyArray[enemyNumber].xPosition,
+        enemyArray[enemyNumber].yPosition
+      )
+    ) {
+      enemyArray[enemyNumber].yPosition = Math.random() * -HEIGHT;
+    }
     enemyNumber++;
   }
 
@@ -161,6 +168,14 @@ function updateCanvas() {
       )
     ) {
       dead = true;
+    }
+    if (
+      bombHit(
+        hardEnemyArray[hardEnemyNumber].xPosition,
+        hardEnemyArray[hardEnemyNumber].yPosition
+      )
+    ) {
+      hardEnemyArray[hardEnemyNumber].yPosition = Math.random() * -HEIGHT;
     }
     hardEnemyNumber++;
   }
@@ -300,12 +315,56 @@ function playerHit(enemyX, enemyY, hardEnemyX, hardEnemyY) {
   }
 }
 
+/*
+function bombHit(enemyX, enemyY, hardEnemyX, hardEnemyY) {
+  var bombHitRight = bombXPosition + bombWidth;
+  var bombHitBottom = playerYPosition + bombHeight;
+
+  var enemyHitLeft = enemyX;
+  var enemyHitRight = enemyX + ENEMY_WIDTH;
+  var enemyHitTop = enemyY;
+  var enemyHitBottom = enemyY + ENEMY_HEIGHT;
+
+  var hardEnemyHitLeft = hardEnemyX;
+  var hardEnemyHitRight = hardEnemyX + HARD_ENEMY_WIDTH;
+  var hardEnemyHitTop = hardEnemyY;
+  var hardEnemyHitBottom = hardEnemyY + HARD_ENEMY_HEIGHT;
+
+  ctx.strokeStyle = "rgb(0,255,0)";
+  ctx.strokeRect(bombXPosition, bombHitBottom, bombYPosition, bombHitRight);
+  ctx.font = "15px arial";
+  ctx.fillStyle = "#000000";
+  ctx.fillText("X pos = " + playerXPosition, 400, 25);
+  ctx.fillText("Y pos = " + playerYPosition, 400, 40);
+
+  if (
+    bombHitRight > enemyHitLeft &&
+    bombXPosition < enemyHitRight &&
+    bombYPosition < enemyHitBottom &&
+    bombHitBottom > enemyHitTop
+  ) {
+    return true;
+  } else if (
+    bombHitRight > hardEnemyHitLeft &&
+    bombXPosition < hardEnemyHitRight &&
+    bombYPosition < hardEnemyHitBottom &&
+    bombHitBottom > hardEnemyHitTop
+  ) {
+    return true;
+  } else {
+    return false;
+  }
+}
+*/
+
 //Code to make the player follow the mouse position
 window.addEventListener("mousemove", mouseMovedFunction);
 
 function mouseMovedFunction(mouseEvent) {
   playerXPosition = mouseEvent.offsetX;
   playerYPosition = mouseEvent.offsetY;
+  bombXPosition = mouseEvent.offsetX;
+  bombYPosition = mouseEvent.offsetY;
 }
 
 //Code to make an explosion happen when "b" is pressed
@@ -315,15 +374,39 @@ function keyDownFunction(keyboardEvent) {
   var keyDown = keyboardEvent.key;
   if (bomb > 0) {
     if (keyDown == "b") {
-      enemyCap - 30;
-      hardEnemyCap - 4;
+      bombXPosition = playerXPosition - 76;
+      bombYPosition = playerYPosition - 64;
+      bombWidth = 200;
+      bombHeight = 200;
+      ctx.fillStyle = "Red";
+      ctx.fillRect(bombXPosition, bombYPosition, bombWidth, bombHeight);
       bomb -= 1;
     }
   }
   console.log("There are", bombArray.length, "bombs in the bombArray");
 }
-
-// This block of code is meant to give a death screen, but isn't working as of now
+/*
+function bombHit(enemyX, enemyY, hardEnemyX, hardEnemyY) {
+  if (
+    bombXPosition + bombWidth > enemyX &&
+    bombXPosition < enemyX + ENEMY_WIDTH &&
+    bombYPosition + bombHeight > enemyY &&
+    bombYPosition < enemyY + ENEMY_HEIGHT
+  ) {
+    return true;
+  } else if (
+    bombXPosition + bombWidth > hardEnemyX &&
+    bombXPosition < hardEnemyX + HARD_ENEMY_WIDTH &&
+    bombYPosition + bombHeight > hardEnemyY &&
+    bombYPosition < hardEnemyY + HARD_ENEMY_HEIGHT
+  ) {
+    return true;
+  } else {
+    return false;
+  }
+}
+*/
+// This block of code displays a death screen when the player gets hit
 function death() {
   ctx.fillStyle = "#FFFFFF";
   ctx.fillRect(0, 0, WIDTH, HEIGHT);
