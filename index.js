@@ -31,6 +31,8 @@ AUDIO.play();
 
 var ctx;
 var level = 0;
+var score = 0;
+var dead = false;
 var playerXPosition = 288;
 var playerYPosition = 381;
 var playerColor;
@@ -54,7 +56,6 @@ var bombImage = new Image();
 bombImage.src = "images/bomb.png";
 
 window.onload = startCanvas;
-onLoad = progression;
 
 function startCanvas() {
   ctx = document.getElementById("myCanvas").getContext("2d");
@@ -79,7 +80,7 @@ function progression() {
     hardEnemyCap + 1;
   }
   level++;
-  enemyCap + 3;
+  enemyCap + 2;
   enemySpeed + 1;
   console.log("There are", enemyArray.length, "enemies in the enemyArray");
   console.log(
@@ -91,6 +92,15 @@ function progression() {
 }
 
 function updateCanvas() {
+  //Ends the updateCanvas() function and calls a function to display a death message if dead = true
+  if (dead) {
+    death();
+    return;
+  }
+  //Adds to the total score when you die (each frame that you were alive for = 1 point)
+  if (level >= 1) {
+    score++;
+  }
   //Colours the background
   ctx.fillStyle = BG_COLOR;
   ctx.fillRect(0, 0, WIDTH, HEIGHT);
@@ -136,8 +146,7 @@ function updateCanvas() {
         enemyArray[enemyNumber].yPosition
       )
     ) {
-      //enemyArray[enemyNumber].yPosition = Math.random() * -HEIGHT;
-      death();
+      dead = true;
     }
     enemyNumber++;
   }
@@ -151,7 +160,7 @@ function updateCanvas() {
         hardEnemyArray[hardEnemyNumber].yPosition
       )
     ) {
-      hardEnemyArray[hardEnemyNumber].yPosition = Math.random() * -HEIGHT;
+      dead = true;
     }
     hardEnemyNumber++;
   }
@@ -232,7 +241,7 @@ class HardEnemy {
 function playerHit(enemyX, enemyY, hardEnemyX, hardEnemyY) {
   //Hitbox stuff
   var playerHitLeft = playerXPosition + 6;
-  var playerHitRight = playerXPosition + PLAYER_WIDTH - 6;
+  var playerHitRight = playerXPosition + PLAYER_WIDTH - 12;
   var playerHitTop = playerYPosition + 6;
   var playerHitBottom = playerYPosition + 6;
 
@@ -291,6 +300,7 @@ function playerHit(enemyX, enemyY, hardEnemyX, hardEnemyY) {
   }
 }
 
+//Code to make the player follow the mouse position
 window.addEventListener("mousemove", mouseMovedFunction);
 
 function mouseMovedFunction(mouseEvent) {
@@ -298,6 +308,7 @@ function mouseMovedFunction(mouseEvent) {
   playerYPosition = mouseEvent.offsetY;
 }
 
+//Code to make an explosion happen when "b" is pressed
 window.addEventListener("keydown", keyDownFunction);
 
 function keyDownFunction(keyboardEvent) {
@@ -314,11 +325,10 @@ function keyDownFunction(keyboardEvent) {
 
 // This block of code is meant to give a death screen, but isn't working as of now
 function death() {
-  while (true) {
-    ctx.fillStyle = "#FFFFFF";
-    ctx.fillRect(0, 0, WIDTH, HEIGHT);
-    ctx.font = "30px arial";
-    ctx.fillStyle = "#000000";
-    ctx.fillText("You died!", 300, 400);
-  }
+  ctx.fillStyle = "#FFFFFF";
+  ctx.fillRect(0, 0, WIDTH, HEIGHT);
+  ctx.font = "30px arial";
+  ctx.fillStyle = "#000000";
+  ctx.fillText("You died!", 225, 400);
+  ctx.fillText("Score: " + score, 225, 450);
 }
