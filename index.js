@@ -19,6 +19,8 @@ const ENEMY_HEIGHT = 38;
 const ENEMY_COLOR = "#FF2222";
 const HARD_ENEMY_WIDTH = 50;
 const HARD_ENEMY_HEIGHT = 50;
+const HEART_WIDTH = 22;
+const HEART_HEIGHT = 20;
 /*
 const AUDIOCTX = new AudioContext();
 const AUDIO = new Audio("audio.mp3");
@@ -53,17 +55,24 @@ var bombWidth = PLAYER_WIDTH;
 var bombHeight = PLAYER_HEIGHT;
 var bombImage = new Image();
 bombImage.src = "images/bomb.png";
+var heartArray = [];
+var heartImage = new Image();
+heartImage.src = "images/power.png";
+var heartSpawn;
 
 window.onload = startCanvas;
 
 function startCanvas() {
   ctx = document.getElementById("myCanvas").getContext("2d");
   timer = setInterval(updateCanvas, 20);
+  progression();
   timer = setInterval(progression, 5000);
 }
 
 //Controls progression with difficulty increasing with each level
 function progression() {
+  heartSpawn = 4; //Math.floor(Math.random() * 4);
+  console.log("Heart spawn value: " + heartSpawn);
   var enemyNumber = 0;
   while (enemyNumber < enemyCap) {
     enemyArray.push(new Enemy(Math.random() * WIDTH));
@@ -77,6 +86,10 @@ function progression() {
       hardEnemyNumber++;
     }
     hardEnemyCap + 1;
+  }
+  if ((heartSpawn = "4")) {
+    //ADD WHILE SHIT HERE
+    heartArray.push(new Heart(Math.random() * WIDTH));
   }
   level++;
   enemyCap + 2;
@@ -146,7 +159,7 @@ function updateCanvas() {
       )
     ) {
       dead = true;
-    }
+    } /*
     if (
       bombHit(
         enemyArray[enemyNumber].xPosition,
@@ -154,7 +167,7 @@ function updateCanvas() {
       )
     ) {
       enemyArray[enemyNumber].yPosition = Math.random() * -HEIGHT;
-    }
+    }*/
     enemyNumber++;
   }
 
@@ -168,7 +181,7 @@ function updateCanvas() {
       )
     ) {
       dead = true;
-    }
+    } /*
     if (
       bombHit(
         hardEnemyArray[hardEnemyNumber].xPosition,
@@ -176,7 +189,7 @@ function updateCanvas() {
       )
     ) {
       hardEnemyArray[hardEnemyNumber].yPosition = Math.random() * -HEIGHT;
-    }
+    }*/
     hardEnemyNumber++;
   }
 
@@ -249,6 +262,25 @@ class HardEnemy {
     }
     if (this.yPosition < 0 - HARD_ENEMY_HEIGHT) {
       this.yPosition = HEIGHT;
+    }
+  }
+}
+
+//Spawns hearts that give you an extra life when collected
+class Heart {
+  constructor() {
+    this.xPosition = Math.random() * -WIDTH;
+    this.yPosition = Math.random() * -HEIGHT;
+  }
+  moveHeart() {
+    heartXPosition += heartXSpeed;
+    heartYPosition += heartYSpeed;
+
+    if (heartXPosition < 0 || heartXPosition + HEART_WIDTH > WIDTH) {
+      heartXSpeed = -heartXSpeed;
+    }
+    if (heartYPosition < 0 || heartYPosition + HEART_HEIGHT > HEIGHT) {
+      heartYSpeed = -heartYSpeed;
     }
   }
 }
@@ -363,11 +395,12 @@ window.addEventListener("mousemove", mouseMovedFunction);
 function mouseMovedFunction(mouseEvent) {
   playerXPosition = mouseEvent.offsetX;
   playerYPosition = mouseEvent.offsetY;
-  bombXPosition = mouseEvent.offsetX;
-  bombYPosition = mouseEvent.offsetY;
+  //bombXPosition = mouseEvent.offsetX;
+  //bombYPosition = mouseEvent.offsetY;
 }
 
 //Code to make an explosion happen when "b" is pressed
+/*
 window.addEventListener("keydown", keyDownFunction);
 
 function keyDownFunction(keyboardEvent) {
@@ -385,7 +418,7 @@ function keyDownFunction(keyboardEvent) {
   }
   console.log("There are", bombArray.length, "bombs in the bombArray");
 }
-/*
+
 function bombHit(enemyX, enemyY, hardEnemyX, hardEnemyY) {
   if (
     bombXPosition + bombWidth > enemyX &&
@@ -406,6 +439,7 @@ function bombHit(enemyX, enemyY, hardEnemyX, hardEnemyY) {
   }
 }
 */
+
 // This block of code displays a death screen when the player gets hit
 function death() {
   ctx.fillStyle = "#FFFFFF";
