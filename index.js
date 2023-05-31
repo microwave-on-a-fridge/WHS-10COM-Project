@@ -29,6 +29,7 @@ SOURCE.connect(AUDIOCTX.destination);
 AUDIO.play();
 */
 
+var c;
 var ctx;
 var level = 0;
 var score = 0;
@@ -55,23 +56,27 @@ var bombWidth = PLAYER_WIDTH;
 var bombHeight = PLAYER_HEIGHT;
 var bombImage = new Image();
 bombImage.src = "images/bomb.png";
+var heart = 0;
 var heartArray = [];
 var heartImage = new Image();
 heartImage.src = "images/power.png";
-var heartSpawn;
+var heartXSpeed = 3;
+var heartYSpeed = 3;
 
 window.onload = startCanvas;
 
 function startCanvas() {
-  ctx = document.getElementById("myCanvas").getContext("2d");
+  c = document.getElementById("myCanvas");
+  ctx = c.getContext("2d");
   timer = setInterval(updateCanvas, 20);
   progression();
   timer = setInterval(progression, 5000);
+  c.addEventListener("mousemove", mouseMovedFunction);
 }
 
 //Controls progression with difficulty increasing with each level
 function progression() {
-  heartSpawn = 4; //Math.floor(Math.random() * 4);
+  var heartSpawn = Math.ceil(Math.random() * 4);
   console.log("Heart spawn value: " + heartSpawn);
   var enemyNumber = 0;
   while (enemyNumber < enemyCap) {
@@ -87,7 +92,7 @@ function progression() {
     }
     hardEnemyCap + 1;
   }
-  if ((heartSpawn = "4")) {
+  if (heartSpawn == 4) {
     //ADD WHILE SHIT HERE
     heartArray.push(new Heart(Math.random() * WIDTH));
   }
@@ -100,6 +105,7 @@ function progression() {
     hardEnemyArray.length,
     "enemies in the hardEnemyArray"
   );
+  console.log("Heart array lenghth: " + heartArray.length);
   console.log("The current enemy speed is", enemySpeed);
 }
 
@@ -149,6 +155,12 @@ function updateCanvas() {
     hardEnemyNumber++;
   }
 
+  var heartNumber = 0;
+  while (heartNumber < heartArray.length) {
+    heartArray[heartNumber].moveHeart();
+    heartNumber++;
+  }
+
   //Controls what happens if you get hit by a standard enemy
   var enemyNumber = 0;
   while (enemyNumber < enemyArray.length) {
@@ -192,6 +204,19 @@ function updateCanvas() {
     }*/
     hardEnemyNumber++;
   }
+  /*
+  var heartNumber = 0;
+  while (heartNumber < heartArray.length) {
+    if (
+      heartCollide(
+        heartArray[heartNumber].xPosition,
+        heartArray[heartNumber].yPosition
+      )
+    ) {
+      heart + 1;
+    }
+  }
+  */
 
   //Draws standard enemies
   var enemyNumber = 0;
@@ -217,6 +242,18 @@ function updateCanvas() {
       HARD_ENEMY_HEIGHT
     );
     hardEnemyNumber++;
+  }
+
+  var heartNumber = 0;
+  while (heartNumber < heartArray.length) {
+    ctx.drawImage(
+      heartImage,
+      heartArray[heartNumber].xPosition,
+      heartArray[heartNumber].yPosition,
+      HEART_WIDTH,
+      HEART_HEIGHT
+    );
+    heartNumber++;
   }
   //Draws the player
   ctx.drawImage(
@@ -269,23 +306,23 @@ class HardEnemy {
 //Spawns hearts that give you an extra life when collected
 class Heart {
   constructor() {
-    this.xPosition = Math.random() * -WIDTH;
-    this.yPosition = Math.random() * -HEIGHT;
+    this.xPosition = Math.random() * WIDTH;
+    this.yPosition = Math.random() * HEIGHT;
   }
   moveHeart() {
-    heartXPosition += heartXSpeed;
-    heartYPosition += heartYSpeed;
+    this.xPosition += heartXSpeed;
+    this.yPosition += heartYSpeed;
 
-    if (heartXPosition < 0 || heartXPosition + HEART_WIDTH > WIDTH) {
+    if (this.xPosition < 0 || this.xPosition + HEART_WIDTH > WIDTH) {
       heartXSpeed = -heartXSpeed;
     }
-    if (heartYPosition < 0 || heartYPosition + HEART_HEIGHT > HEIGHT) {
+    if (this.yPosition < 0 || this.yPosition + HEART_HEIGHT > HEIGHT) {
       heartYSpeed = -heartYSpeed;
     }
   }
 }
 
-function playerHit(enemyX, enemyY, hardEnemyX, hardEnemyY) {
+function playerHit(enemyX, enemyY, hardEnemyX, hardEnemyY, heartX, heartY) {
   //Hitbox stuff
   var playerHitLeft = playerXPosition + 6;
   var playerHitRight = playerXPosition + PLAYER_WIDTH - 12;
@@ -302,6 +339,11 @@ function playerHit(enemyX, enemyY, hardEnemyX, hardEnemyY) {
   var hardEnemyHitTop = hardEnemyY;
   var hardEnemyHitBottom = hardEnemyY + HARD_ENEMY_HEIGHT;
 
+  var heartHitLeft = heartX;
+  var heartHitRight = heartX + HEART_WIDTH;
+  var heartHitTop = heartY;
+  var heartHitBottom = heartY + HEART_HEIGHT;
+
   //Pretty sure this block of code doesn't do anything unless debug mode is enabled
   var playerHitWidth = playerHitRight - playerHitLeft;
   var playerHitHeight = playerHitBottom - playerHitTop;
@@ -309,6 +351,8 @@ function playerHit(enemyX, enemyY, hardEnemyX, hardEnemyY) {
   var enemyHitHeight = enemyHitBottom - enemyHitTop;
   var hardEnemyHitWidth = hardEnemyHitRight - hardEnemyHitLeft;
   var hardEnemyHitHeight = hardEnemyHitBottom - hardEnemyHitTop;
+  var heartHitWidth = heartHitRight - heartHitLeft;
+  var heartHitHeight = heartHitBottom - heartHitTop;
 
   //DEBUG DEBUG DEBUG
   /*
@@ -322,6 +366,7 @@ function playerHit(enemyX, enemyY, hardEnemyX, hardEnemyY) {
     hardEnemyHitWidth,
     hardEnemyHitHeight
   );
+  ctx.strokeRect(heartHitLeft, heartHitTop, heartHitWidth, heartHitHeight);
   ctx.font = "15px arial";
   ctx.fillStyle = "#000000";
   ctx.fillText("X pos = " + playerXPosition, 400, 25);
@@ -342,61 +387,45 @@ function playerHit(enemyX, enemyY, hardEnemyX, hardEnemyY) {
     playerHitBottom > hardEnemyHitTop
   ) {
     return true;
-  } else {
-    return false;
-  }
-}
-
-/*
-function bombHit(enemyX, enemyY, hardEnemyX, hardEnemyY) {
-  var bombHitRight = bombXPosition + bombWidth;
-  var bombHitBottom = playerYPosition + bombHeight;
-
-  var enemyHitLeft = enemyX;
-  var enemyHitRight = enemyX + ENEMY_WIDTH;
-  var enemyHitTop = enemyY;
-  var enemyHitBottom = enemyY + ENEMY_HEIGHT;
-
-  var hardEnemyHitLeft = hardEnemyX;
-  var hardEnemyHitRight = hardEnemyX + HARD_ENEMY_WIDTH;
-  var hardEnemyHitTop = hardEnemyY;
-  var hardEnemyHitBottom = hardEnemyY + HARD_ENEMY_HEIGHT;
-
-  ctx.strokeStyle = "rgb(0,255,0)";
-  ctx.strokeRect(bombXPosition, bombHitBottom, bombYPosition, bombHitRight);
-  ctx.font = "15px arial";
-  ctx.fillStyle = "#000000";
-  ctx.fillText("X pos = " + playerXPosition, 400, 25);
-  ctx.fillText("Y pos = " + playerYPosition, 400, 40);
-
-  if (
-    bombHitRight > enemyHitLeft &&
-    bombXPosition < enemyHitRight &&
-    bombYPosition < enemyHitBottom &&
-    bombHitBottom > enemyHitTop
-  ) {
-    return true;
   } else if (
-    bombHitRight > hardEnemyHitLeft &&
-    bombXPosition < hardEnemyHitRight &&
-    bombYPosition < hardEnemyHitBottom &&
-    bombHitBottom > hardEnemyHitTop
+    playerHitRight > heartHitLeft &&
+    playerHitLeft < heartHitRight &&
+    playerHitTop < heartHitBottom &&
+    playerHitBottom > heartHitTop
   ) {
     return true;
   } else {
     return false;
   }
 }
-*/
+
+function heartCollide(heartX, heartY) {
+  var playerHitLeft = playerXPosition + 6;
+  var playerHitRight = playerXPosition + PLAYER_WIDTH - 12;
+  var playerHitTop = playerYPosition + 6;
+  var playerHitBottom = playerYPosition + 6;
+
+  var heartHitLeft = heartX;
+  var heartHitRight = heartX + HEART_WIDTH;
+  var heartHitTop = heartY;
+  var heartHitBottom = heartY + HEART_HEIGHT;
+  if (
+    playerHitRight > heartHitLeft &&
+    playerHitLeft < heartHitRight &&
+    playerHitTop < heartHitBottom &&
+    playerHitBottom > heartHitTop
+  ) {
+    return true;
+  } else {
+    return false;
+  }
+}
 
 //Code to make the player follow the mouse position
-window.addEventListener("mousemove", mouseMovedFunction);
 
 function mouseMovedFunction(mouseEvent) {
   playerXPosition = mouseEvent.offsetX;
   playerYPosition = mouseEvent.offsetY;
-  //bombXPosition = mouseEvent.offsetX;
-  //bombYPosition = mouseEvent.offsetY;
 }
 
 //Code to make an explosion happen when "b" is pressed
