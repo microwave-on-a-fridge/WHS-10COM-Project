@@ -3,7 +3,7 @@
  * Author: Koen Hina
  * Date: 11/5/2023
  * Version: 1
- * Description: Vertical shooter game.
+ * Description: Survival game.
  * License: MIT
  **/
 
@@ -49,13 +49,6 @@ var hardEnemyCap = 3;
 var hardEnemyImage = new Image();
 hardEnemyImage.src = "images/hard.png";
 var hardEnemySpeed = 3;
-var bomb = 3;
-var bombXPosition = playerXPosition;
-var bombYPosition = playerYPosition;
-var bombWidth = PLAYER_WIDTH;
-var bombHeight = PLAYER_HEIGHT;
-var bombImage = new Image();
-bombImage.src = "images/bomb.png";
 var heart = 0;
 var heartArray = [];
 var heartImage = new Image();
@@ -83,6 +76,7 @@ function progression() {
     enemyArray.push(new Enemy(Math.random() * WIDTH));
     enemyNumber++;
   }
+  console.log("here 1");
   //At level 5 a new enemy type is made
   if (level >= 5) {
     var hardEnemyNumber = 0;
@@ -92,12 +86,20 @@ function progression() {
     }
     hardEnemyCap + 1;
   }
+  console.log("here 2");
+  /*
+  var heartNumber = 0;
+  while (heartNumber < 1) {
   if (heartSpawn == 4) {
     //ADD WHILE SHIT HERE
     heartArray.push(new Heart(Math.random() * WIDTH));
+    heartNumber++;
   }
+  }
+  */
+  console.log("here 3");
   level++;
-  enemyCap + 2;
+  enemyCap + 1;
   enemySpeed + 1;
   console.log("There are", enemyArray.length, "enemies in the enemyArray");
   console.log(
@@ -127,7 +129,7 @@ function updateCanvas() {
   ctx.font = "30px arial";
   ctx.fillStyle = "#000000";
   ctx.fillText("Level " + level, 0, 25);
-  ctx.fillText(bomb + " bombs", 0, 55);
+  ctx.fillText(heart + " extra lives", 0, 55);
 
   //Controls the border to stop the player from being able to move out of the playfield to avoid being hit by the enemies
   if (playerXPosition > WIDTH - PLAYER_WIDTH) {
@@ -171,15 +173,7 @@ function updateCanvas() {
       )
     ) {
       dead = true;
-    } /*
-    if (
-      bombHit(
-        enemyArray[enemyNumber].xPosition,
-        enemyArray[enemyNumber].yPosition
-      )
-    ) {
-      enemyArray[enemyNumber].yPosition = Math.random() * -HEIGHT;
-    }*/
+    }
     enemyNumber++;
   }
 
@@ -193,15 +187,7 @@ function updateCanvas() {
       )
     ) {
       dead = true;
-    } /*
-    if (
-      bombHit(
-        hardEnemyArray[hardEnemyNumber].xPosition,
-        hardEnemyArray[hardEnemyNumber].yPosition
-      )
-    ) {
-      hardEnemyArray[hardEnemyNumber].yPosition = Math.random() * -HEIGHT;
-    }*/
+    }
     hardEnemyNumber++;
   }
   /*
@@ -387,13 +373,6 @@ function playerHit(enemyX, enemyY, hardEnemyX, hardEnemyY, heartX, heartY) {
     playerHitBottom > hardEnemyHitTop
   ) {
     return true;
-  } else if (
-    playerHitRight > heartHitLeft &&
-    playerHitLeft < heartHitRight &&
-    playerHitTop < heartHitBottom &&
-    playerHitBottom > heartHitTop
-  ) {
-    return true;
   } else {
     return false;
   }
@@ -409,6 +388,7 @@ function heartCollide(heartX, heartY) {
   var heartHitRight = heartX + HEART_WIDTH;
   var heartHitTop = heartY;
   var heartHitBottom = heartY + HEART_HEIGHT;
+
   if (
     playerHitRight > heartHitLeft &&
     playerHitLeft < heartHitRight &&
@@ -419,6 +399,20 @@ function heartCollide(heartX, heartY) {
   } else {
     return false;
   }
+
+  /*
+  if (
+    playerXPosition + PLAYER_WIDTH > heartX &&
+    playerXPosition < heartX + HEART_WIDTH &&
+    playerYPosition + PLAYER_HEIGHT > heartY &&
+    playerYPosition < heartY + HEART_HEIGHT
+  ) {
+    //heart + 1;
+    return true;
+  } else {
+    return false;
+  }
+  */
 }
 
 //Code to make the player follow the mouse position
@@ -427,47 +421,6 @@ function mouseMovedFunction(mouseEvent) {
   playerXPosition = mouseEvent.offsetX;
   playerYPosition = mouseEvent.offsetY;
 }
-
-//Code to make an explosion happen when "b" is pressed
-/*
-window.addEventListener("keydown", keyDownFunction);
-
-function keyDownFunction(keyboardEvent) {
-  var keyDown = keyboardEvent.key;
-  if (bomb > 0) {
-    if (keyDown == "b") {
-      bombXPosition = playerXPosition - 76;
-      bombYPosition = playerYPosition - 64;
-      bombWidth = 200;
-      bombHeight = 200;
-      ctx.fillStyle = "Red";
-      ctx.fillRect(bombXPosition, bombYPosition, bombWidth, bombHeight);
-      bomb -= 1;
-    }
-  }
-  console.log("There are", bombArray.length, "bombs in the bombArray");
-}
-
-function bombHit(enemyX, enemyY, hardEnemyX, hardEnemyY) {
-  if (
-    bombXPosition + bombWidth > enemyX &&
-    bombXPosition < enemyX + ENEMY_WIDTH &&
-    bombYPosition + bombHeight > enemyY &&
-    bombYPosition < enemyY + ENEMY_HEIGHT
-  ) {
-    return true;
-  } else if (
-    bombXPosition + bombWidth > hardEnemyX &&
-    bombXPosition < hardEnemyX + HARD_ENEMY_WIDTH &&
-    bombYPosition + bombHeight > hardEnemyY &&
-    bombYPosition < hardEnemyY + HARD_ENEMY_HEIGHT
-  ) {
-    return true;
-  } else {
-    return false;
-  }
-}
-*/
 
 // This block of code displays a death screen when the player gets hit
 function death() {
