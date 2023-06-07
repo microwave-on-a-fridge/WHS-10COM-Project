@@ -49,13 +49,13 @@ var hardEnemyCap = 3;
 var hardEnemyImage = new Image();
 hardEnemyImage.src = "images/hard.png";
 var hardEnemySpeed = 3;
-var heart = 0;
+var heart = 999;
 var heartArray = [];
 var heartImage = new Image();
 heartImage.src = "images/power.png";
 var heartXSpeed = 3;
 var heartYSpeed = 3;
-var heartSpawn;
+var heartSpawn = 4;
 
 window.onload = startCanvas;
 
@@ -71,7 +71,6 @@ function startCanvas() {
 
 //Controls progression with difficulty increasing with each level
 function progression() {
-  heartSpawn = Math.ceil(Math.random() * 4);
   console.log("Heart spawn value: " + heartSpawn);
   var enemyNumber = 0;
   while (enemyNumber < enemyCap) {
