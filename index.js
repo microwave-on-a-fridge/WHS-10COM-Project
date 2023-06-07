@@ -65,8 +65,8 @@ function startCanvas() {
   timer = setInterval(updateCanvas, 20);
   progression();
   timer = setInterval(progression, 5000);
-  //timer = setInterval(heartCollide, 20);
   c.addEventListener("mousemove", mouseMovedFunction);
+  //c.addEventListener("keydown", death);
 }
 
 //Controls progression with difficulty increasing with each level
@@ -436,10 +436,19 @@ function mouseMovedFunction(mouseEvent) {
 
 // This block of code displays a death screen when the player gets hit and doesn't have any extra lifes
 function death() {
+  //keyboardEvent) {
+  //var keyDown = keyboardEvent.key;
   ctx.fillStyle = "#FFFFFF";
   ctx.fillRect(0, 0, WIDTH, HEIGHT);
   ctx.font = "30px arial";
   ctx.fillStyle = "#000000";
   ctx.fillText("You died!", 225, 400);
   ctx.fillText("Score: " + score, 225, 450);
+  ctx.fillRect(200, 550, 200, 100);
+  ctx.fillStyle = "#FFFFFF";
+  ctx.fillText("Press Space", 220, 600);
+  ctx.fillText("to retry", 250, 630);
+  /*if (keyDown == " ") {
+    location.reload();
+  }*/
 }
