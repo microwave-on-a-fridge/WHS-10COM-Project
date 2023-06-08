@@ -66,7 +66,8 @@ function startCanvas() {
   progression();
   timer = setInterval(progression, 5000);
   c.addEventListener("mousemove", mouseMovedFunction);
-  //c.addEventListener("keydown", death);
+  c.addEventListener("click", reset);
+  c.style.cursor = "none";
 }
 
 //Controls progression with difficulty increasing with each level
@@ -436,8 +437,7 @@ function mouseMovedFunction(mouseEvent) {
 
 // This block of code displays a death screen when the player gets hit and doesn't have any extra lifes
 function death() {
-  //keyboardEvent) {
-  //var keyDown = keyboardEvent.key;
+  c.style.cursor = "default";
   ctx.fillStyle = "#FFFFFF";
   ctx.fillRect(0, 0, WIDTH, HEIGHT);
   ctx.font = "30px arial";
@@ -448,7 +448,14 @@ function death() {
   ctx.fillStyle = "#FFFFFF";
   ctx.fillText("Press Space", 220, 600);
   ctx.fillText("to retry", 250, 630);
-  /*if (keyDown == " ") {
-    location.reload();
-  }*/
+}
+function reset() {
+  if (
+    playerXPosition >= 200 &&
+    playerXPosition <= 400 &&
+    playerYPosition >= 550 &&
+    playerYPosition <= 650
+  ) {
+    console.log("reset");
+  }
 }
