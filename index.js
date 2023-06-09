@@ -1,7 +1,7 @@
 /**
  * Title: 10COM Game Project
  * Author: Koen Hina
- * Date: 11/5/2023
+ * Date: 9/6/2023
  * Version: 7.1
  * Description: Survival game.
  * License: MIT
@@ -21,18 +21,14 @@ const HARD_ENEMY_WIDTH = 50;
 const HARD_ENEMY_HEIGHT = 50;
 const HEART_WIDTH = 22;
 const HEART_HEIGHT = 20;
-/*
-const AUDIOCTX = new AudioContext();
-const AUDIO = new Audio("audio.mp3");
-const SOURCE = AUDIOCTX.createMediaElementSource(AUDIO);
-SOURCE.connect(AUDIOCTX.destination);
-AUDIO.play();
-*/
 
 var c;
 var ctx;
+var debugMode = false;
 var level = 0;
 var score = 0;
+//This checks the saved information for what the previously saved high score is
+var highScore = localStorage.getItem("topscore");
 var dead = false;
 var playerXPosition = 288;
 var playerYPosition = 381;
@@ -47,12 +43,12 @@ var enemySpeed = 6;
 var hardEnemyArray = [];
 var hardEnemyCap = 3;
 var hardEnemyImage = new Image();
-hardEnemyImage.src = "images/hard.png";
+hardEnemyImage.src = "images/test.png";
 var hardEnemySpeed = 3;
 var heart = 0;
 var heartArray = [];
 var heartImage = new Image();
-heartImage.src = "images/power.png";
+heartImage.src = "images/heart.png";
 var heartXSpeed = 3;
 var heartYSpeed = 3;
 var heartSpawn;
@@ -89,18 +85,11 @@ function progression() {
     }
     hardEnemyCap + 1;
   }
-  console.log("here 2");
 
-  //var heartNumber = 0;
-  //while (heartNumber < 1) {
   if (heartSpawn == 4) {
-    //ADD WHILE SHIT HERE
     heartArray.push(new Heart(Math.random() * WIDTH));
-    //heartNumber++;
   }
-  //}
 
-  console.log("here 3");
   level++;
   enemyCap + 1;
   enemySpeed + 1;
@@ -110,7 +99,7 @@ function progression() {
     hardEnemyArray.length,
     "enemies in the hardEnemyArray"
   );
-  console.log("Heart array lenghth: " + heartArray.length);
+  console.log("Heart array length: " + heartArray.length);
   console.log("The current enemy speed is", enemySpeed);
 }
 
@@ -120,10 +109,7 @@ function updateCanvas() {
     death();
     return;
   }
-  //Adds to the total score when you die (each frame that you were alive for = 1 point)
-  if (level >= 1) {
-    score++;
-  }
+
   //Colours the background
   ctx.fillStyle = BG_COLOR;
   ctx.fillRect(0, 0, WIDTH, HEIGHT);
@@ -206,7 +192,6 @@ function updateCanvas() {
 
   //Trying to get this shit to work is making me want to kill myself
   var heartNumber = 0;
-  console.log("Heart array length" + heartArray.length);
   while (heartNumber < heartArray.length) {
     if (
       heartCollide(
@@ -268,6 +253,9 @@ function updateCanvas() {
     PLAYER_WIDTH,
     PLAYER_HEIGHT
   );
+
+  //Adds to the total score when you die (each frame that you were alive for = 1 point)
+  score++;
 }
 
 //Controls ordinary enemies
@@ -442,12 +430,34 @@ function death() {
   ctx.fillRect(0, 0, WIDTH, HEIGHT);
   ctx.font = "30px arial";
   ctx.fillStyle = "#000000";
-  ctx.fillText("You died!", 225, 400);
-  ctx.fillText("Score: " + score, 225, 450);
-  ctx.fillRect(200, 550, 200, 100);
+  ctx.fillText("You died!", 220, 300);
+  ctx.fillText("Score: " + score, 220, 350);
+  ctx.fillText("Highscore: " + highScore, 220, 380);
+  ctx.strokeStyle = "#000000";
+  ctx.beginPath();
+  ctx.roundRect(200, 550, 200, 100, 20);
+  ctx.stroke();
+  ctx.fill();
   ctx.fillStyle = "#FFFFFF";
-  ctx.fillText("Press Space", 220, 600);
-  ctx.fillText("to retry", 250, 630);
+  ctx.fillText("Click to retry", 220, 610);
+  if (
+    playerXPosition >= 200 &&
+    playerXPosition <= 400 &&
+    playerYPosition >= 550 &&
+    playerYPosition <= 650
+  ) {
+    c.style.cursor = "pointer";
+  }
+  if (score > highScore) {
+    highScore = score;
+    localStorage.setItem("topscore", highScore);
+  }
+  if (debugMode) {
+    if (playerXPosition >= 575 && playerYPosition >= 775) {
+      highScore = 0;
+      localStorage.setItem("topscore", highScore);
+    }
+  }
 }
 function reset() {
   if (
@@ -457,5 +467,6 @@ function reset() {
     playerYPosition <= 650
   ) {
     console.log("reset");
+    location.reload();
   }
 }
