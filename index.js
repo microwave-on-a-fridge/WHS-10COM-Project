@@ -104,6 +104,9 @@ function progression() {
 }
 
 function updateCanvas() {
+  if (debugMode) {
+    highScore = document.getElementById("setScore").value;
+  }
   //Ends the updateCanvas() function and calls a function to display a death message if dead = true
   if (dead) {
     death();
@@ -348,23 +351,27 @@ function playerHit(enemyX, enemyY, hardEnemyX, hardEnemyY, heartX, heartY) {
   var heartHitHeight = heartHitBottom - heartHitTop;
 
   //DEBUG DEBUG DEBUG
-  /*
-  console.log("Debug mode enabled!");
-  ctx.strokeStyle = "rgb(0,255,0)";
-  ctx.strokeRect(playerHitLeft, playerHitTop, playerHitWidth, playerHitHeight);
-  ctx.strokeRect(enemyHitLeft, enemyHitTop, enemyHitWidth, enemyHitHeight);
-  ctx.strokeRect(
-    hardEnemyHitLeft,
-    hardEnemyHitTop,
-    hardEnemyHitWidth,
-    hardEnemyHitHeight
-  );
-  ctx.strokeRect(heartHitLeft, heartHitTop, heartHitWidth, heartHitHeight);
-  ctx.font = "15px arial";
-  ctx.fillStyle = "#000000";
-  ctx.fillText("X pos = " + playerXPosition, 400, 25);
-  ctx.fillText("Y pos = " + playerYPosition, 400, 40);
-  */
+  if (debugMode) {
+    ctx.strokeStyle = "rgb(0,255,0)";
+    ctx.strokeRect(
+      playerHitLeft,
+      playerHitTop,
+      playerHitWidth,
+      playerHitHeight
+    );
+    ctx.strokeRect(enemyHitLeft, enemyHitTop, enemyHitWidth, enemyHitHeight);
+    ctx.strokeRect(
+      hardEnemyHitLeft,
+      hardEnemyHitTop,
+      hardEnemyHitWidth,
+      hardEnemyHitHeight
+    );
+    ctx.strokeRect(heartHitLeft, heartHitTop, heartHitWidth, heartHitHeight);
+    ctx.font = "15px arial";
+    ctx.fillStyle = "#000000";
+    ctx.fillText("X pos = " + playerXPosition, 400, 25);
+    ctx.fillText("Y pos = " + playerYPosition, 400, 40);
+  }
 
   if (
     playerHitRight > enemyHitLeft &&
@@ -399,9 +406,10 @@ function heartCollide(heartX, heartY) {
 
     var heartHitWidth = heartHitRight - heartHitLeft;
     var heartHitHeight = heartHitBottom - heartHitTop;
-    //console.log("Debug mode enabled!");
-    //ctx.strokeStyle = "rgb(0,255,0)";
-    //ctx.strokeRect(heartHitLeft, heartHitTop, heartHitWidth, heartHitHeight);
+    if (debugMode) {
+      ctx.strokeStyle = "rgb(0,255,0)";
+      ctx.strokeRect(heartHitLeft, heartHitTop, heartHitWidth, heartHitHeight);
+    }
 
     if (
       playerHitRight > heartHitLeft &&
@@ -459,6 +467,7 @@ function death() {
     }
   }
 }
+
 function reset() {
   if (
     playerXPosition >= 200 &&
@@ -468,5 +477,28 @@ function reset() {
   ) {
     console.log("reset");
     location.reload();
+  }
+}
+
+function dipswitches(dipswitch) {
+  if (debugMode) {
+    if ((dipswitch = score)) {
+      score = 0;
+      highScore = 0;
+      localStorage.setItem("topscore", highScore);
+    }
+    if ((dipswitch = life)) {
+      heart++;
+    }
+  }
+}
+
+function debug() {
+  debugMode = true;
+  var x = document.getElementById("debug");
+  if (x.style.display === "none") {
+    x.style.display = "block";
+  } else {
+    x.style.display = "none";
   }
 }
