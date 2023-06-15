@@ -30,6 +30,10 @@ var score = 0;
 //This checks the saved information for what the previously saved high score is
 var highScore = localStorage.getItem("topscore");
 var dead = false;
+/*
+var invincible = false;
+var invincibilityDuration = 1000; // milliseconds
+*/
 var playerXPosition = 288;
 var playerYPosition = 381;
 var playerColor;
@@ -112,6 +116,17 @@ function updateCanvas() {
     death();
     return;
   }
+  //Invincibility shit 2
+  /*
+  if (invincible) {
+    // Reduce invincibility duration
+    invincibilityDuration -= 20; // 20ms elapsed since last frame
+
+    if (invincibilityDuration <= 0) {
+      invincible = false; // End invincibility frames
+    }
+  }
+  */
 
   //Colours the background
   ctx.fillStyle = BG_COLOR;
@@ -167,8 +182,14 @@ function updateCanvas() {
       if (heart <= 0) {
         dead = true;
       } else {
-        enemyArray[enemyNumber].yPosition = Math.random() * -HEIGHT;
-        heart--;
+        if (!invincible) {
+          enemyArray[enemyNumber].yPosition = Math.random() * -HEIGHT;
+          heart--;
+          /*
+          invincible = true;
+          invincibilityDuration = 1000;
+          */
+        }
       }
     }
     enemyNumber++;
@@ -319,6 +340,11 @@ class Heart {
 }
 
 function playerHit(enemyX, enemyY, hardEnemyX, hardEnemyY, heartX, heartY) {
+  /*
+  if (invincible) {
+    return false; // Ignore collision if player is invincible
+  }
+  */
   //Hitbox stuff
   var playerHitLeft = playerXPosition + 6;
   var playerHitRight = playerXPosition + PLAYER_WIDTH - 12;
@@ -372,7 +398,6 @@ function playerHit(enemyX, enemyY, hardEnemyX, hardEnemyY, heartX, heartY) {
     ctx.fillText("X pos = " + playerXPosition, 400, 25);
     ctx.fillText("Y pos = " + playerYPosition, 400, 40);
   }
-
   if (
     playerHitRight > enemyHitLeft &&
     playerHitLeft < enemyHitRight &&
@@ -502,3 +527,10 @@ function debug() {
     x.style.display = "none";
   }
 }
+/*
+function invincibility() {
+  invincible = true;
+}
+*/
+
+//34, 119, 189, 344
