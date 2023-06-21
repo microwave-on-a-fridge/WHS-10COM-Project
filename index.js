@@ -2,7 +2,7 @@
  * Title: 10COM Game Project
  * Author: Koen Hina
  * Date: 9/6/2023
- * Version: 7.1
+ * Version: idek at this point, probably pre0.600 or some shit
  * Description: Survival game.
  * License: MIT
  **/
@@ -11,12 +11,11 @@ console.log("10COM JS Project");
 
 const WIDTH = 600;
 const HEIGHT = 800;
-const BG_COLOR = "#EFB0FF";
+const BG_COLOR = "#efb0ff";
 const PLAYER_WIDTH = 24;
 const PLAYER_HEIGHT = 36;
 const ENEMY_WIDTH = 26;
 const ENEMY_HEIGHT = 38;
-const ENEMY_COLOR = "#FF2222";
 const HARD_ENEMY_WIDTH = 50;
 const HARD_ENEMY_HEIGHT = 50;
 const HEART_WIDTH = 22;
@@ -27,13 +26,10 @@ var ctx;
 var debugMode = false;
 var level = 0;
 var score = 0;
-//This checks the saved information for what the previously saved high score is
+//This checks the locally saved information for what the previously saved high score is
 var highScore = localStorage.getItem("topscore");
 var dead = false;
-/*
 var invincible = false;
-var invincibilityDuration = 1000; // milliseconds
-*/
 var playerXPosition = 288;
 var playerYPosition = 381;
 var playerColor;
@@ -79,7 +75,6 @@ function progression() {
     enemyArray.push(new Enemy(Math.random() * WIDTH));
     enemyNumber++;
   }
-  console.log("here 1");
   //At level 5 a new enemy type is made
   if (level >= 5) {
     var hardEnemyNumber = 0;
@@ -110,23 +105,15 @@ function progression() {
 function updateCanvas() {
   if (debugMode) {
     highScore = document.getElementById("setScore").value;
+    if (highScore >= highScore) {
+      localStorage.setItem("topscore", highScore);
+    }
   }
   //Ends the updateCanvas() function and calls a function to display a death message if dead = true
   if (dead) {
     death();
     return;
   }
-  //Invincibility shit 2
-  /*
-  if (invincible) {
-    // Reduce invincibility duration
-    invincibilityDuration -= 20; // 20ms elapsed since last frame
-
-    if (invincibilityDuration <= 0) {
-      invincible = false; // End invincibility frames
-    }
-  }
-  */
 
   //Colours the background
   ctx.fillStyle = BG_COLOR;
@@ -179,16 +166,15 @@ function updateCanvas() {
         enemyArray[enemyNumber].yPosition
       )
     ) {
-      if (heart <= 0) {
-        dead = true;
-      } else {
-        if (!invincible) {
+      if (!invincible) {
+        if (heart <= 0) {
+          dead = true;
+        } else {
           enemyArray[enemyNumber].yPosition = Math.random() * -HEIGHT;
           heart--;
-          /*
+          //Gives the player temporary invinvibility by making the player invincible, then waiting one second and calling a function to make the player no longer invincible
           invincible = true;
-          invincibilityDuration = 1000;
-          */
+          setTimeout(iFramesTimer, 1000);
         }
       }
     }
@@ -204,17 +190,21 @@ function updateCanvas() {
         hardEnemyArray[hardEnemyNumber].yPosition
       )
     ) {
-      if (heart <= 0) {
-        dead = true;
-      } else {
-        hardEnemyArray[hardEnemyNumber].yPosition = Math.random() * -HEIGHT;
-        heart--;
+      if (!invincible) {
+        if (heart <= 0) {
+          dead = true;
+        } else {
+          hardEnemyArray[hardEnemyNumber].yPosition = Math.random() * -HEIGHT;
+          heart--;
+          invincible = true;
+          setTimeout(iFramesTimer, 1000);
+        }
       }
     }
     hardEnemyNumber++;
   }
 
-  //Trying to get this shit to work is making me want to kill myself
+  //Controls what happens when you collide with a heart
   var heartNumber = 0;
   while (heartNumber < heartArray.length) {
     if (
@@ -256,7 +246,7 @@ function updateCanvas() {
     hardEnemyNumber++;
   }
 
-  //I can't even remember what this was meant to do 😭
+  //Draws heart objects
   var heartNumber = 0;
   while (heartNumber < heartArray.length) {
     ctx.drawImage(
@@ -278,7 +268,7 @@ function updateCanvas() {
     PLAYER_HEIGHT
   );
 
-  //Adds to the total score when you die (each frame that you were alive for = 1 point)
+  //Adds to the total score when you die (each frame that you were alive for is 1 point)
   score++;
 }
 
@@ -340,12 +330,7 @@ class Heart {
 }
 
 function playerHit(enemyX, enemyY, hardEnemyX, hardEnemyY, heartX, heartY) {
-  /*
-  if (invincible) {
-    return false; // Ignore collision if player is invincible
-  }
-  */
-  //Hitbox stuff
+  //Hitbox stuff (IT IS AN INTENTIONAL GAMEPLAY DECISION TO MAKE THE PLAYER HITBOX MUCH SMALLER THAN THE PLAYER SPRITE!!!)
   var playerHitLeft = playerXPosition + 6;
   var playerHitRight = playerXPosition + PLAYER_WIDTH - 12;
   var playerHitTop = playerYPosition + 6;
@@ -366,7 +351,6 @@ function playerHit(enemyX, enemyY, hardEnemyX, hardEnemyY, heartX, heartY) {
   var heartHitTop = heartY;
   var heartHitBottom = heartY + HEART_HEIGHT;
 
-  //Pretty sure this block of code doesn't do anything unless debug mode is enabled
   var playerHitWidth = playerHitRight - playerHitLeft;
   var playerHitHeight = playerHitBottom - playerHitTop;
   var enemyHitWidth = enemyHitRight - enemyHitLeft;
@@ -398,25 +382,29 @@ function playerHit(enemyX, enemyY, hardEnemyX, hardEnemyY, heartX, heartY) {
     ctx.fillText("X pos = " + playerXPosition, 400, 25);
     ctx.fillText("Y pos = " + playerYPosition, 400, 40);
   }
-  if (
-    playerHitRight > enemyHitLeft &&
-    playerHitLeft < enemyHitRight &&
-    playerHitTop < enemyHitBottom &&
-    playerHitBottom > enemyHitTop
-  ) {
-    return true;
-  } else if (
-    playerHitRight > hardEnemyHitLeft &&
-    playerHitLeft < hardEnemyHitRight &&
-    playerHitTop < hardEnemyHitBottom &&
-    playerHitBottom > hardEnemyHitTop
-  ) {
-    return true;
-  } else {
-    return false;
+  //If the player isn't currently invincible, do collision
+  if (!invincible) {
+    if (
+      playerHitRight > enemyHitLeft &&
+      playerHitLeft < enemyHitRight &&
+      playerHitTop < enemyHitBottom &&
+      playerHitBottom > enemyHitTop
+    ) {
+      return true;
+    } else if (
+      playerHitRight > hardEnemyHitLeft &&
+      playerHitLeft < hardEnemyHitRight &&
+      playerHitTop < hardEnemyHitBottom &&
+      playerHitBottom > hardEnemyHitTop
+    ) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }
 
+//Player to heart collision
 function heartCollide(heartX, heartY) {
   if (heartSpawn == 4) {
     var playerHitLeft = playerXPosition;
@@ -424,10 +412,10 @@ function heartCollide(heartX, heartY) {
     var playerHitTop = playerYPosition;
     var playerHitBottom = playerYPosition;
 
-    var heartHitLeft = heartX - 5;
-    var heartHitRight = heartX + HEART_WIDTH + 5;
-    var heartHitTop = heartY - 5;
-    var heartHitBottom = heartY + HEART_HEIGHT + 5;
+    var heartHitLeft = heartX - 10;
+    var heartHitRight = heartX + HEART_WIDTH + 10;
+    var heartHitTop = heartY - 10;
+    var heartHitBottom = heartY + HEART_HEIGHT + 10;
 
     var heartHitWidth = heartHitRight - heartHitLeft;
     var heartHitHeight = heartHitBottom - heartHitTop;
@@ -450,29 +438,30 @@ function heartCollide(heartX, heartY) {
 }
 
 //Code to make the player follow the mouse position
-
 function mouseMovedFunction(mouseEvent) {
   playerXPosition = mouseEvent.offsetX;
   playerYPosition = mouseEvent.offsetY;
 }
 
-// This block of code displays a death screen when the player gets hit and doesn't have any extra lifes
 function death() {
+  //This block of code displays a death screen when the player gets hit and doesn't have any extra lifes
   c.style.cursor = "default";
   ctx.fillStyle = "#FFFFFF";
   ctx.fillRect(0, 0, WIDTH, HEIGHT);
   ctx.font = "30px arial";
   ctx.fillStyle = "#000000";
-  ctx.fillText("You died!", 220, 300);
-  ctx.fillText("Score: " + score, 220, 350);
-  ctx.fillText("Highscore: " + highScore, 220, 380);
+  ctx.textAlign = "center";
+  ctx.fillText("You died!", 300, 300);
+  ctx.fillText("Score: " + score, 300, 350);
+  ctx.fillText("Highscore: " + highScore, 300, 380);
   ctx.strokeStyle = "#000000";
   ctx.beginPath();
   ctx.roundRect(200, 550, 200, 100, 20);
   ctx.stroke();
   ctx.fill();
   ctx.fillStyle = "#FFFFFF";
-  ctx.fillText("Click to retry", 220, 610);
+  ctx.fillText("Click to retry", 300, 610);
+  //Changes the cursor to a pointer cursor (improves the experience as it makes the player know that the Retry button is clickable)
   if (
     playerXPosition >= 200 &&
     playerXPosition <= 400 &&
@@ -481,18 +470,19 @@ function death() {
   ) {
     c.style.cursor = "pointer";
   }
-  if (score > highScore) {
+  //If the score from that playthrough was higher than the highscore, that new score will be locally saved as the new highscore, and will display a message congratulating the player on their accomplishment
+  if (score >= highScore) {
     highScore = score;
     localStorage.setItem("topscore", highScore);
-  }
-  if (debugMode) {
-    if (playerXPosition >= 575 && playerYPosition >= 775) {
-      highScore = 0;
-      localStorage.setItem("topscore", highScore);
-    }
+    console.log("New highscore set");
+    ctx.font = "30px arial";
+    ctx.fillStyle = "#000000";
+    ctx.textAlign = "center";
+    ctx.fillText("New Highscore!", 200, 410);
   }
 }
 
+//Reloads the page when the user clicks on the Retry button on the death screen
 function reset() {
   if (
     playerXPosition >= 200 &&
@@ -505,6 +495,7 @@ function reset() {
   }
 }
 
+//Some debug dipswitches, such as manually resetting the high score and granting the player invincibility
 function dipswitches(dipswitch) {
   if (debugMode) {
     if ((dipswitch = score)) {
@@ -513,24 +504,23 @@ function dipswitches(dipswitch) {
       localStorage.setItem("topscore", highScore);
     }
     if ((dipswitch = life)) {
-      heart++;
+      invincible = true;
     }
   }
 }
 
+//Controls whether debug mode is enabled or not
 function debug() {
   debugMode = true;
-  var x = document.getElementById("debug");
-  if (x.style.display === "none") {
-    x.style.display = "block";
+  //Displays debug elements on the HTML page
+  var doc = document.getElementById("debug");
+  if (doc.style.display === "none") {
+    doc.style.display = "block";
   } else {
-    x.style.display = "none";
+    doc.style.display = "none";
   }
 }
-/*
-function invincibility() {
-  invincible = true;
-}
-*/
 
-//34, 119, 189, 344
+function iFramesTimer() {
+  invincible = false;
+}
