@@ -1,7 +1,7 @@
 /**
  * Title: 10COM Game Project
  * Author: Koen Hina
- * Date: 9/6/2023
+ * Date: 23/06/2023
  * Version: idek at this point, probably pre0.600 or some shit
  * Description: Survival game.
  * License: MIT
@@ -26,8 +26,7 @@ var ctx;
 var debugMode = false;
 var level = 0;
 var score = 0;
-//This checks the locally saved information for what the previously saved high score is
-var highScore = localStorage.getItem("topscore");
+var highScore = localStorage.getItem("topscore"); //This checks the locally saved information for what the previously saved high score is
 var dead = false;
 var invincible = false;
 var playerXPosition = 288;
@@ -35,6 +34,8 @@ var playerYPosition = 381;
 var playerColor;
 var playerImage = new Image();
 playerImage.src = "images/marisa.png";
+var playerHitImage = new Image();
+playerHitImage.src = "images/hit.png";
 var enemyArray = [];
 var enemyCap = 10;
 var enemyImage = new Image();
@@ -260,14 +261,26 @@ function updateCanvas() {
   }
 
   //Draws the player
-  ctx.drawImage(
-    playerImage,
-    playerXPosition,
-    playerYPosition,
-    PLAYER_WIDTH,
-    PLAYER_HEIGHT
-  );
+  if (!invincible) {
+    ctx.drawImage(
+      playerImage,
+      playerXPosition,
+      playerYPosition,
+      PLAYER_WIDTH,
+      PLAYER_HEIGHT
+    );
+  }
 
+  //Draws a hit sprite when the player is invincible after being hit by an enemy
+  if (invincible) {
+    ctx.drawImage(
+      playerHitImage,
+      playerXPosition,
+      playerYPosition,
+      PLAYER_WIDTH,
+      PLAYER_HEIGHT
+    );
+  }
   //Adds to the total score when you die (each frame that you were alive for is 1 point)
   score++;
 }
@@ -376,7 +389,6 @@ function playerHit(enemyX, enemyY, hardEnemyX, hardEnemyY, heartX, heartY) {
       hardEnemyHitWidth,
       hardEnemyHitHeight
     );
-    ctx.strokeRect(heartHitLeft, heartHitTop, heartHitWidth, heartHitHeight);
     ctx.font = "15px arial";
     ctx.fillStyle = "#000000";
     ctx.fillText("X pos = " + playerXPosition, 400, 25);
@@ -478,20 +490,22 @@ function death() {
     ctx.font = "30px arial";
     ctx.fillStyle = "#000000";
     ctx.textAlign = "center";
-    ctx.fillText("New Highscore!", 200, 410);
+    ctx.fillText("New Highscore!", 300, 410);
   }
 }
 
 //Reloads the page when the user clicks on the Retry button on the death screen
 function reset() {
-  if (
-    playerXPosition >= 200 &&
-    playerXPosition <= 400 &&
-    playerYPosition >= 550 &&
-    playerYPosition <= 650
-  ) {
-    console.log("reset");
-    location.reload();
+  if (dead) {
+    if (
+      playerXPosition >= 200 &&
+      playerXPosition <= 400 &&
+      playerYPosition >= 550 &&
+      playerYPosition <= 650
+    ) {
+      console.log("reset");
+      location.reload();
+    }
   }
 }
 
