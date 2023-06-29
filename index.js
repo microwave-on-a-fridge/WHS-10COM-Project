@@ -3,10 +3,11 @@
  * Author: Koen Hina
  * Date: 23/06/2023
  * Version: idek at this point, probably pre0.600 or some shit
- * Description: Survival game.
+ * Description: Survival highscore game.
  * License: MIT
  **/
 
+//This whole project is held together with glue and sellotape
 console.log("10COM JS Project");
 
 const WIDTH = 600;
@@ -29,11 +30,34 @@ var score = 0;
 var highScore = localStorage.getItem("topscore"); //This checks the locally saved information for what the previously saved high score is
 var dead = false;
 var invincible = false;
+var highContrast = false;
+//This is an array full of different background images that will be randomly chosen and then rendered as the background image for each playthrough. The images were made with this tool I found on itch.io by Deep-Fold, very cool tool! https://deep-fold.itch.io/space-background-generator
+var bgImages = [
+  "images/bg/01.png",
+  "images/bg/02.png",
+  "images/bg/03.png",
+  "images/bg/04.png",
+  "images/bg/05.png",
+  "images/bg/06.png",
+  "images/bg/07.png",
+  "images/bg/08.png",
+  "images/bg/09.png",
+  "images/bg/10.png",
+  "images/bg/11.png",
+  "images/bg/12.png",
+  "images/bg/13.png",
+  "images/bg/14.png",
+];
+var bgRandomizer = Math.floor(Math.random() * bgImages.length);
+var bgImage = new Image();
+bgImage.src = (bgRandomizer, bgImages[bgRandomizer]);
+var gameOverImage = new Image();
+gameOverImage.src = "images/bg/14.png";
 var playerXPosition = 288;
 var playerYPosition = 381;
 var playerColor;
 var playerImage = new Image();
-playerImage.src = "images/marisa.png";
+playerImage.src = "images/player.png";
 var playerHitImage = new Image();
 playerHitImage.src = "images/hit.png";
 var enemyArray = [];
@@ -116,15 +140,27 @@ function updateCanvas() {
     return;
   }
 
-  //Colours the background
-  ctx.fillStyle = BG_COLOR;
-  ctx.fillRect(0, 0, WIDTH, HEIGHT);
+  //Draws the background image if high contrast mode is disabled (default)
+  if (!highContrast) {
+    ctx.drawImage(bgImage, 0, 0, WIDTH, HEIGHT);
+  } else {
+    ctx.fillStyle = BG_COLOR;
+    ctx.fillRect(0, 0, WIDTH, HEIGHT);
+  }
 
   //Controls the level display
   ctx.font = "30px arial";
-  ctx.fillStyle = "#000000";
+  ctx.textAlign = "start";
+  ctx.fillStyle = "#FFFFFF";
   ctx.fillText("Level " + level, 0, 25);
   ctx.fillText(heart + " extra lives", 0, 55);
+  ctx.textAlign = "center";
+  if (level <= 1) {
+    ctx.fillStyle = "#FFFFFF";
+    ctx.fillText("Move your character by", 300, 600);
+    ctx.fillText("moving the mouse. Try", 300, 630);
+    ctx.fillText("your best not to get hit!", 300, 660);
+  }
 
   //Controls the border to stop the player from being able to move out of the playfield to avoid being hit by the enemies
   if (playerXPosition > WIDTH - PLAYER_WIDTH) {
@@ -173,7 +209,7 @@ function updateCanvas() {
         } else {
           enemyArray[enemyNumber].yPosition = Math.random() * -HEIGHT;
           heart--;
-          //Gives the player temporary invinvibility by making the player invincible, then waiting one second and calling a function to make the player no longer invincible
+          //Gives the player temporary invincibility by making the player invincible, then waiting one second and calling a function to make the player no longer invincible
           invincible = true;
           setTimeout(iFramesTimer, 1000);
         }
@@ -456,22 +492,26 @@ function mouseMovedFunction(mouseEvent) {
 }
 
 function death() {
-  //This block of code displays a death screen when the player gets hit and doesn't have any extra lifes
+  //This block of code displays a death screen when the player gets hit and doesn't have any extra lives
   c.style.cursor = "default";
-  ctx.fillStyle = "#FFFFFF";
-  ctx.fillRect(0, 0, WIDTH, HEIGHT);
+  if (!highContrast) {
+    ctx.drawImage(bgImage, 0, 0, WIDTH, HEIGHT);
+  } else {
+    ctx.fillStyle = "#000000";
+    ctx.fillRect(0, 0, WIDTH, HEIGHT);
+  }
   ctx.font = "30px arial";
-  ctx.fillStyle = "#000000";
+  ctx.fillStyle = "#FFFFFF";
   ctx.textAlign = "center";
   ctx.fillText("You died!", 300, 300);
   ctx.fillText("Score: " + score, 300, 350);
   ctx.fillText("Highscore: " + highScore, 300, 380);
-  ctx.strokeStyle = "#000000";
+  ctx.strokeStyle = "#FFFFFF";
   ctx.beginPath();
   ctx.roundRect(200, 550, 200, 100, 20);
   ctx.stroke();
   ctx.fill();
-  ctx.fillStyle = "#FFFFFF";
+  ctx.fillStyle = "#000000";
   ctx.fillText("Click to retry", 300, 610);
   //Changes the cursor to a pointer cursor (improves the experience as it makes the player know that the Retry button is clickable)
   if (
@@ -488,7 +528,7 @@ function death() {
     localStorage.setItem("topscore", highScore);
     console.log("New highscore set");
     ctx.font = "30px arial";
-    ctx.fillStyle = "#000000";
+    ctx.fillStyle = "#FFFFFF";
     ctx.textAlign = "center";
     ctx.fillText("New Highscore!", 300, 410);
   }
@@ -537,4 +577,12 @@ function debug() {
 
 function iFramesTimer() {
   invincible = false;
+}
+
+function contrast() {
+  if (!highContrast) {
+    highContrast = true;
+  } else {
+    highContrast = false;
+  }
 }
