@@ -15,12 +15,14 @@ const HEIGHT = 800;
 const BG_COLOR = "#efb0ff";
 const PLAYER_WIDTH = 24;
 const PLAYER_HEIGHT = 36;
-const ENEMY_WIDTH = 26;
-const ENEMY_HEIGHT = 38;
+const ENEMY_WIDTH = 31;
+const ENEMY_HEIGHT = 29;
 const HARD_ENEMY_WIDTH = 50;
 const HARD_ENEMY_HEIGHT = 50;
-const HEART_WIDTH = 22;
-const HEART_HEIGHT = 20;
+const HEART_WIDTH = 27;
+const HEART_HEIGHT = 28;
+const HIT_SPRITE_WIDTH = 73;
+const HIT_SPRITE_HEIGHT = 60;
 
 var c;
 var ctx;
@@ -51,29 +53,32 @@ var bgImages = [
 var bgRandomizer = Math.floor(Math.random() * bgImages.length);
 var bgImage = new Image();
 bgImage.src = (bgRandomizer, bgImages[bgRandomizer]);
-var gameOverImage = new Image();
-gameOverImage.src = "images/bg/14.png";
 var playerXPosition = 288;
 var playerYPosition = 381;
 var playerColor;
+//Sprite created by SNK and ripped by Gussprint on The Spriters Resource. Source: https://www.spriters-resource.com/neo_geo_ngcd/ms3/sheet/11346/
 var playerImage = new Image();
 playerImage.src = "images/player.png";
+//Sprite created by SNK and ripped by Gussprint on The Spriters Resource. Source: https://www.spriters-resource.com/neo_geo_ngcd/ms3/sheet/11305/
 var playerHitImage = new Image();
 playerHitImage.src = "images/hit.png";
 var enemyArray = [];
 var enemyCap = 10;
+//Sprite created by SNK and ripped by MagmaDragoon on The Spriters Resource. Source: https://www.spriters-resource.com/neo_geo_ngcd/ms3/sheet/46508/
 var enemyImage = new Image();
-enemyImage.src = "images/cirno.png";
+enemyImage.src = "images/enemy.png";
 var enemySpeed = 6;
 var hardEnemyArray = [];
 var hardEnemyCap = 3;
+//Sprite created by SNK and ripped by c2000mc/futaokuu on The Spriters Resource. Source: https://www.spriters-resource.com/neo_geo_ngcd/ms3/sheet/36253/
 var hardEnemyImage = new Image();
-hardEnemyImage.src = "images/test.png";
+hardEnemyImage.src = "images/hard.png";
 var hardEnemySpeed = 3;
 var heart = 0;
 var heartArray = [];
+//Sprite created by SNK and ripped by MagmaDragoon on The Spriters Resource. Source: https://www.spriters-resource.com/neo_geo_ngcd/ms3/sheet/39080/
 var heartImage = new Image();
-heartImage.src = "images/heart.png";
+heartImage.src = "images/gas.png";
 var heartXSpeed = 3;
 var heartYSpeed = 3;
 var heartSpawn;
@@ -153,13 +158,15 @@ function updateCanvas() {
   ctx.textAlign = "start";
   ctx.fillStyle = "#FFFFFF";
   ctx.fillText("Level " + level, 0, 25);
-  ctx.fillText(heart + " extra lives", 0, 55);
+  ctx.fillText(heart + " extra gas tanks", 0, 55);
   ctx.textAlign = "center";
-  if (level <= 1) {
+  if (level <= 2) {
     ctx.fillStyle = "#FFFFFF";
     ctx.fillText("Move your character by", 300, 600);
     ctx.fillText("moving the mouse. Try", 300, 630);
     ctx.fillText("your best not to get hit!", 300, 660);
+    ctx.fillText("Collect gas tanks to stay", 300, 690);
+    ctx.fillText("alive for longer!", 300, 720);
   }
 
   //Controls the border to stop the player from being able to move out of the playfield to avoid being hit by the enemies
@@ -313,8 +320,8 @@ function updateCanvas() {
       playerHitImage,
       playerXPosition,
       playerYPosition,
-      PLAYER_WIDTH,
-      PLAYER_HEIGHT
+      HIT_SPRITE_WIDTH,
+      HIT_SPRITE_HEIGHT
     );
   }
   //Adds to the total score when you die (each frame that you were alive for is 1 point)
