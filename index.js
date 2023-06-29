@@ -89,7 +89,6 @@ function startCanvas() {
   c = document.getElementById("myCanvas");
   ctx = c.getContext("2d");
   timer = setInterval(updateCanvas, 20);
-  progression();
   timer = setInterval(progression, 5000);
   c.addEventListener("mousemove", mouseMovedFunction);
   c.addEventListener("click", reset);
@@ -160,7 +159,7 @@ function updateCanvas() {
   ctx.fillText("Level " + level, 0, 25);
   ctx.fillText(heart + " extra gas tanks", 0, 55);
   ctx.textAlign = "center";
-  if (level <= 2) {
+  if (level <= 1) {
     ctx.fillStyle = "#FFFFFF";
     ctx.fillText("Move your character by", 300, 600);
     ctx.fillText("moving the mouse. Try", 300, 630);
@@ -433,7 +432,7 @@ function playerHit(enemyX, enemyY, hardEnemyX, hardEnemyY, heartX, heartY) {
       hardEnemyHitHeight
     );
     ctx.font = "15px arial";
-    ctx.fillStyle = "#000000";
+    ctx.fillStyle = "#FFFFFF";
     ctx.fillText("X pos = " + playerXPosition, 400, 25);
     ctx.fillText("Y pos = " + playerYPosition, 400, 40);
   }
@@ -564,9 +563,11 @@ function dipswitches(dipswitch) {
       highScore = 0;
       localStorage.setItem("topscore", highScore);
     }
+    /* DOESNT WORK LMAO
     if ((dipswitch = life)) {
       invincible = true;
     }
+    */
   }
 }
 
